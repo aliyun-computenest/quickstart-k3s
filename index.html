@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="计算巢是阿里云开放给企业应用服务商的服务管理平台。服务商能够在计算巢上发布私有化部署服务，为其客户提供云上软件一键部署的能力；同时也支持全托管模式的服务，赋能服务商托管其客户资源。">
+  <title>K3s社区版服务实例部署文档 - Aliyun 计算巢 x quickstart-k3s</title>
+
+  <link rel="shortcut icon" href="img/favicon.ico">
+
+  <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css">
+  <link rel="stylesheet" href="css/theme.css">
+  
+
+  
+
+  
+  
+
+  
+    <script src="search/main.js"></script>
+  
+
+  
+
+  <script src="js/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="nav">
+      <div class="nav-inner">
+        <div class="logo">
+          <img src="./img/logo-2x.png">
+        </div>
+        <div class="nav-list">
+          <ul>
+          
+              <li><a href="#k3s">K3s社区版服务实例部署文档</a></li>
+              
+                  <li><a href="#_1">概述</a></li>
+                  
+              
+                  <li><a href="#_2">计费说明</a></li>
+                  
+              
+                  <li><a href="#_3">部署架构</a></li>
+                  
+              
+                  <li><a href="#ram">RAM账号所需权限</a></li>
+                  
+              
+                  <li><a href="#_4">部署流程</a></li>
+                  
+                      <li class="li-h3"><a href="#_5">部署步骤</a></li>
+                  
+                      <li class="li-h3"><a href="#_6">部署参数说明</a></li>
+                  
+                      <li class="li-h3"><a href="#_7">验证结果</a></li>
+                  
+                      <li class="li-h3"><a href="#k3s_1">使用K3s</a></li>
+                  
+              
+          
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="content theme-github">
+      
+      <div class="content-inner">        
+        
+        <h1 id="k3s">K3s社区版服务实例部署文档</h1>
+<h2 id="_1">概述</h2>
+<p><a href="https://docs.k3s.io/zh/">K3s</a>是一个完全兼容的 Kubernetes 发行版，具有以下增强功能：</p>
+<ul>
+<li>打包为单个二进制文件。</li>
+<li>使用基于 sqlite3 作为默认存储机制的轻量级存储后端。同时支持使用 etcd3、MySQL 和 Postgres。</li>
+<li>封装在简单的启动程序中，可以处理很多复杂的 TLS 和选项。</li>
+<li>默认情况下是安全的，对轻量级环境有合理的默认值。</li>
+<li>添加了简单但强大的 batteries-included 功能，例如：<ul>
+<li>本地存储提供程序</li>
+<li>service load balancer</li>
+<li>Helm controller</li>
+<li>Traefik ingress controller</li>
+</ul>
+</li>
+<li>所有 Kubernetes control plane 组件的操作都封装在单个二进制文件和进程中。因此，K3s 支持自动化和管理复杂的集群操作（例如证书分发等）。</li>
+<li>最大程度减轻了外部依赖性，K3s 仅需要现代内核和 cgroup 挂载。K3s 打包了所需的依赖，包括：<ul>
+<li>containerd</li>
+<li>Flannel (CNI)</li>
+<li>CoreDNS</li>
+<li>Traefik (Ingress)</li>
+<li>Klipper-lb (Service LB)</li>
+<li>嵌入式网络策略控制器</li>
+<li>嵌入式 local-path-provisioner</li>
+<li>主机实用程序（iptables、socat 等）</li>
+</ul>
+</li>
+</ul>
+<p>本文向您介绍根据K3s社区版服务部署实例的流程和使用说明。</p>
+<h2 id="_2">计费说明</h2>
+<p>K3s社区版在计算巢上的费用主要涉及：</p>
+<ul>
+<li>所选vCPU与内存规格</li>
+<li>磁盘容量</li>
+<li>公网带宽</li>
+</ul>
+<p>计费方式包括：</p>
+<ul>
+<li>按量付费（小时）</li>
+<li>包年包月</li>
+</ul>
+<p>预估费用在创建实例时可实时看到。</p>
+<h2 id="_3">部署架构</h2>
+<p>K3s社区版是单机部署架构。</p>
+<h2 id="ram">RAM账号所需权限</h2>
+<p>K3s社区版服务需要对ECS、VPC等资源进行访问和创建操作，若您使用RAM用户创建服务实例，需要在创建服务实例前，对使用的RAM用户的账号添加相应资源的权限。添加RAM权限的详细操作，请参见<a href="https://help.aliyun.com/document_detail/121945.html">为RAM用户授权</a>
+。所需权限如下表所示。</p>
+<table>
+<thead>
+<tr>
+<th>权限策略名称</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AliyunECSFullAccess</td>
+<td>管理云服务器服务（ECS）的权限</td>
+</tr>
+<tr>
+<td>AliyunVPCFullAccess</td>
+<td>管理专有网络（VPC）的权限</td>
+</tr>
+<tr>
+<td>AliyunROSFullAccess</td>
+<td>管理资源编排服务（ROS）的权限</td>
+</tr>
+<tr>
+<td>AliyunComputeNestUserFullAccess</td>
+<td>管理计算巢服务（ComputeNest）的用户侧权限</td>
+</tr>
+<tr>
+<td>AliyunCloudMonitorFullAccess</td>
+<td>管理云监控（CloudMonitor）的权限</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_4">部署流程</h2>
+<h3 id="_5">部署步骤</h3>
+<p>单击<a href="https://computenest.console.aliyun.com/service/instance/create/cn-hangzhou?type=user&amp;ServiceId=service-2f7333225ee342ee8fa7">部署链接</a>
+，进入服务实例部署界面，根据界面提示，填写参数完成部署。</p>
+<h3 id="_6">部署参数说明</h3>
+<p>您在创建服务实例的过程中，需要配置服务实例信息。下文介绍K3s社区版服务实例输入参数的详细信息。</p>
+<table>
+<thead>
+<tr>
+<th>参数组</th>
+<th>参数项</th>
+<th>示例</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>服务实例名称</td>
+<td></td>
+<td>test</td>
+<td>实例的名称</td>
+</tr>
+<tr>
+<td>地域</td>
+<td></td>
+<td>华东1（杭州）</td>
+<td>选中服务实例的地域，建议就近选中，以获取更好的网络延时。</td>
+</tr>
+<tr>
+<td>可用区配置</td>
+<td>部署区域</td>
+<td>可用区I</td>
+<td>地域下的不同可用区域</td>
+</tr>
+<tr>
+<td>付费类型配置</td>
+<td>付费类型</td>
+<td>按量付费 或 包年包月</td>
+<td></td>
+</tr>
+<tr>
+<td>选择已有基础资源配置</td>
+<td>VPC ID</td>
+<td>vpc-xxx</td>
+<td>选择专有网络的ID。</td>
+</tr>
+<tr>
+<td>选择已有基础资源配置</td>
+<td>交换机ID</td>
+<td>vsw-xxx</td>
+<td>选择交换机ID。若找不到交换机, 可尝试切换地域和可用区</td>
+</tr>
+<tr>
+<td>ECS实例配置</td>
+<td>实例类型</td>
+<td>ecs.g6.large</td>
+<td>实例规格，可以根据实际需求选择</td>
+</tr>
+<tr>
+<td>ECS实例配置</td>
+<td>系统盘空间</td>
+<td>40</td>
+<td>系统盘空间，可以根据实际需求选择</td>
+</tr>
+<tr>
+<td>ECS实例配置</td>
+<td>数据盘空间</td>
+<td>40</td>
+<td>数据盘空间，可以根据实际需求选择</td>
+</tr>
+<tr>
+<td>ECS实例配置</td>
+<td>实例密码</td>
+<td><strong><em>*</em></strong>*</td>
+<td>设置实例密码。长度8~30个字符，必须包含三项（大写字母、小写字母、数字、()`~!@#$%^&amp;*-+={}[]:;'&lt;&gt;,.?/ 中的特殊符号）</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="1.jpg" src="1.jpg" /></p>
+<h3 id="_7">验证结果</h3>
+<ol>
+<li>
+<p>查看服务实例。
+   服务实例创建成功后，部署时间大约需要2分钟。部署完成后，页面上可以看到对应的服务实例。</p>
+</li>
+<li>
+<p>获取集群访问凭证:</p>
+<ul>
+<li>
+<p>方式1：运维管理页中，选择执行"获取集群凭证"运维项，在执行结果中查看凭证
+    <img alt="2.jpg" src="2.jpg" /></p>
+</li>
+<li>
+<p>方式2：远程连接服务节点，获取访问凭证：/etc/rancher/k3s/k3s.yaml
+    <img alt="3.jpg" src="3.jpg" /></p>
+</li>
+<li>
+<p>方式3：发送远程命令: cat /etc/rancher/k3s/k3s.yaml，查看命令的执行结果
+    <img alt="4.jpg" src="4.jpg" />
+    <img alt="5.jpg" src="5.jpg" /></p>
+</li>
+</ul>
+</li>
+<li>
+<p>在集群外的节点配置凭证访问集群:</p>
+<ul>
+<li>私网访问：在~/.kube/config中写入凭证文件，把凭证中的server-ip替换为服务实例的私网Ip（在概览页获取），使用kubectl命令访问集群
+    <img alt="6.jpg" src="6.jpg" />
+    <img alt="7.jpg" src="7.jpg" />
+    <code>kubectl get pods --all-namespaces</code></li>
+<li>公网访问：在~/.kube/config中写入凭证文件，把凭证中的server-ip替换为服务实例的公网Ip（在概览页获取），使用kubectl命令访问集群
+    <code>kubectl get pods --all-namespaces --insecure-skip-tls-verify</code>
+    <img alt="8.jpg" src="8.jpg" /></li>
+</ul>
+</li>
+</ol>
+<h3 id="k3s_1">使用K3s</h3>
+<p>请访问K3s官网了解如何使用K3s：<a href="https://docs.k3s.io/zh/">K3s使用文档</a></p>
+        
+      </div>
+
+      <div class="copyrights">© 2009-2022 Aliyun.com 版权所有</div>
+    </div>
+  </div>
+  
+  <!--
+  MkDocs version      : 1.5.3
+  Docs Build Date UTC : 2023-12-07 05:30:25.993921+00:00
+  -->
+</body>
+</html>
