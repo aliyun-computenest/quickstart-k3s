@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="计算巢是阿里云开放给企业应用服务商的服务管理平台。服务商能够在计算巢上发布私有化部署服务，为其客户提供云上软件一键部署的能力；同时也支持全托管模式的服务，赋能服务商托管其客户资源。">
+  <title>K3s Community Edition Service Instance Deployment Document - Aliyun 计算巢 x quickstart-k3s</title>
+
+  <link rel="shortcut icon" href="../img/favicon.ico">
+
+  <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css">
+  <link rel="stylesheet" href="../css/theme.css">
+  
+
+  
+
+  
+  
+
+  
+    <script src="../search/main.js"></script>
+  
+
+  
+
+  <script src="../js/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="nav">
+      <div class="nav-inner">
+        <div class="logo">
+          <img src="./img/logo-2x.png">
+        </div>
+        <div class="nav-list">
+          <ul>
+          
+              <li><a href="#k3s-community-edition-service-instance-deployment-document">K3s Community Edition Service Instance Deployment Document</a></li>
+              
+                  <li><a href="#overview">Overview</a></li>
+                  
+              
+                  <li><a href="#billing-description">Billing Description</a></li>
+                  
+              
+                  <li><a href="#deployment-architecture">Deployment Architecture</a></li>
+                  
+              
+                  <li><a href="#permissions-required-for-ram-accounts">Permissions required for RAM accounts</a></li>
+                  
+              
+                  <li><a href="#deployment-process">Deployment process</a></li>
+                  
+                      <li class="li-h3"><a href="#deployment-steps">Deployment steps</a></li>
+                  
+                      <li class="li-h3"><a href="#deployment-parameter-description">Deployment parameter description</a></li>
+                  
+                      <li class="li-h3"><a href="#validation-results">Validation Results</a></li>
+                  
+                      <li class="li-h3"><a href="#use-k3s">Use K3s</a></li>
+                  
+              
+          
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="content theme-github">
+      
+      <div class="content-inner">        
+        
+        <h1 id="k3s-community-edition-service-instance-deployment-document">K3s Community Edition Service Instance Deployment Document</h1>
+<h2 id="overview">Overview</h2>
+<p><a href="https://docs.k3s.io/zh/">K3s</a> is a fully compatible Kubernetes release with the following enhancements:</p>
+<p>-Packaged as a single binary file.
+-Use a lightweight storage backend based on sqlite3 as the default storage mechanism. It also supports etcd3, MySQL, and Postgres.
+-Encapsulated in a simple startup program, it can handle many complex TLS and options.
+-It is safe by default and has reasonable default values for lightweight environments.
+-Added simple but powerful batteries-included functions, such:
+-Local Storage Provider
+-service load balancer
+-Helm controller
+-Traefik ingress controller
+-All operations Kubernetes control plane components are encapsulated in a single binary file and process. As a result, K3s enables the automation and management of complex cluster operations (such as certificate distribution, etc.).
+-Minimizes external dependencies, K3s requires only modern kernels and cgroup mounts. K3s packages the required dependencies, including:
+-containerd
+-Flannel (CNI)
+-CoreDNS
+-Traefik (Ingress)
+-Klipper-lb (Service LB)
+-Embedded Network Policy Controller
+-embedded local-path-provisioner
+-Host utilities (iptables, socat, etc.)</p>
+<p>This article introduces you to the process and instructions for deploying an instance based on the K3s Community Edition service.</p>
+<h2 id="billing-description">Billing Description</h2>
+<p>The cost of the K3s Community Edition on the computing nest mainly involves:</p>
+<p>-Selected vCPU and memory specifications
+-Disk Capacity
+-public network bandwidth</p>
+<p>Billing methods include:</p>
+<p>-Pay-As-You-Go (hours)
+-Package year and package month</p>
+<p>The estimated cost can be seen in real time when the instance is created.</p>
+<h2 id="deployment-architecture">Deployment Architecture</h2>
+<p>K3s Community Edition is a stand-alone deployment architecture.</p>
+<h2 id="permissions-required-for-ram-accounts">Permissions required for RAM accounts</h2>
+<p>The K3s community edition service needs to access and create resources such as ECS and VPC. If you use a RAM user to create a service instance, you need to add the corresponding resource permissions to the account of the RAM user before creating the service instance. For details about how to add RAM permissions, see <a href="https://help.aliyun.com/document_detail/121945.html">Authorize RAM users</a>
+。 The required permissions are shown in the following table.</p>
+<table>
+<thead>
+<tr>
+<th>Permission policy name</th>
+<th>Comment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AliyunECSFullAccess</td>
+<td>Permissions to manage ECS instances</td>
+</tr>
+<tr>
+<td>AliyunVPCFullAccess</td>
+<td>Permissions to manage a VPC</td>
+</tr>
+<tr>
+<td>AliyunROSFullAccess</td>
+<td>Manage permissions for Resource Orchestration Service (ROS)</td>
+</tr>
+<tr>
+<td>AliyunComputeNestUserFullAccess</td>
+<td>Manage user-side permissions for the compute nest service (ComputeNest)</td>
+</tr>
+<tr>
+<td>AliyunCloudMonitorFullAccess</td>
+<td>Permissions to manage CloudMonitor (CloudMonitor)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="deployment-process">Deployment process</h2>
+<h3 id="deployment-steps">Deployment steps</h3>
+<p>Click Deployment Link (https://computenest.console.aliyun.com/service/instance/create/cn-hangzhou?type=user&amp;ServiceId=service-2f7333225ee342ee8fa7)
+, enter the service instance deployment interface, according to the interface prompt, fill in the parameters to complete the deployment.</p>
+<h3 id="deployment-parameter-description">Deployment parameter description</h3>
+<p>When you create a service instance, you need to configure the service instance information. The following section describes the details of the K3s Community Edition service instance input parameters.</p>
+<p>| Parameter group | Parameter item | Example | Description |
+| ------------ | -------- | --------------------------------------------------------------------------- |
+| Service instance name | | test | Instance name |
+| Region | | China (Hangzhou) | Select the region of the service instance. We recommend that you select the region nearby to obtain better network latency. |
+| Availability Zone Configuration | Deployment Region | Zone I | Different Availability Zones in a Region |
+| Payment Type Configuration | Payment Type | Pay-As-You-Go or Subscription |
+| Select an existing basic resource configuration | VPC ID | vpc-xxx | Select the VPC ID. |
+| Select the existing basic resource configuration | VSwitch ID | vsw-xxx | Select the VSwitch ID. If the switch cannot be found, try switching the region and zone |
+| ECS instance configuration | Instance type | ecs.g6.large | Instance type, which can be selected according to actual needs |
+| ECS instance configuration | System disk space | 40 | System disk space can be selected according to actual needs |
+| ECS instance configuration | Data disk space | 40 | Data disk space can be selected according to actual needs |
+| ECS instance configuration | Instance password | <strong><em>*</em></strong><em> | Set the instance password. It must be 8 to 30 characters in length and must contain three items (uppercase letters, lowercase letters, numbers, ()'~!@#$%^&amp; </em>-+ ={}[]:;' &lt;&gt;,.?/special symbols) |</p>
+<p><img alt="1.jpg" src="../images-en/1.jpg" /></p>
+<h3 id="validation-results">Validation Results</h3>
+<ol>
+<li>
+<p>View the service instance.
+After the service instance is created successfully, the deployment time takes about 2 minutes. After the deployment is complete, the corresponding service instance is displayed on the page.</p>
+</li>
+<li>
+<p>Obtain cluster access credentials:
+-Method 1: On the Operation and Maintenance Management page, select the operation and maintenance item "Obtain Cluster Voucher" and view the voucher in the execution result.
+<img alt="2.jpg" src="../images-en/2.jpg" /></p>
+</li>
+</ol>
+<p>-Method 2: Connect to the service node remotely and obtain the access credential:/etc/rancher/k3s/k3s.yaml
+<img alt="3.jpg" src="../images-en/3.jpg" /></p>
+<p>-Method 3: Send a remote command: cat /etc/rancher/k3s/k3s.yaml to view the execution result of the command
+<img alt="4.jpg" src="../images-en/4.jpg" />
+<img alt="5.jpg" src="../images-en/5.jpg" /></p>
+<ol>
+<li>Configure credentials on nodes outside the cluster to access the cluster:
+-private network access: write the credential file in ~/.kube/config, replace the server-ip in the credential with the private network ip of the service instance (obtained on the overview page), and use the kubectl command to access the cluster.
+<img alt="6.jpg" src="../images-en/6.jpg" />
+<img alt="7.jpg" src="../images-en/7.jpg" />
+'''
+kubectl get pods --all-namespaces
+'''
+-public network access: write the credential file in ~/.kube/config, replace the server-ip in the credential with the public IP of the service instance (obtained on the overview page), and use the kubectl command to access the cluster.
+'''
+kubectl get pods --all-namespaces --insecure-skip-tls-verify
+'''
+<img alt="8.jpg" src="../images-en/8.jpg" /></li>
+</ol>
+<h3 id="use-k3s">Use K3s</h3>
+<p>Please visit the K3s website to learn how to use K3s:<a href="https://docs.k3s.io/zh/">K3s Usage Documentation</a></p>
+        
+      </div>
+
+      <div class="copyrights">© 2009-2022 Aliyun.com 版权所有</div>
+    </div>
+  </div>
+  
+  <!--
+  MkDocs version      : 1.6.1
+  Docs Build Date UTC : 2026-03-23 07:30:24.624824+00:00
+  -->
+</body>
+</html>
